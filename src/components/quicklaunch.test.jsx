@@ -5,6 +5,7 @@ import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "test-utils/render-with-providers";
+import dashboardFetcher from "utils/dashboard-fetcher";
 
 const { state, useSWR, getStoredProvider } = vi.hoisted(() => ({
   state: {
@@ -72,6 +73,12 @@ describe("components/quicklaunch", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     state.widgets = {};
+  });
+
+  it("uses the checked dashboard fetcher for shared widget data", () => {
+    renderWithProviders(<Wrapper />);
+
+    expect(useSWR).toHaveBeenCalledWith("/api/widgets", dashboardFetcher);
   });
 
   it("uses a custom provider from quicklaunch settings when configured", async () => {

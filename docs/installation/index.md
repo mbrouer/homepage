@@ -81,4 +81,6 @@ For OIDC login (overrides password login):
 
 All app pages and `/api` routes except `/api/healthcheck` and `/api/config/custom.css` will require a signed-in session. Static assets remain public.
 
+If your session expires while the dashboard is open, its next dashboard data request sends you back to sign-in. After signing in, you return to the same URL, including the selected tab.
+
 Configure your OIDC provider with the a callback URI like `https://homepage.example.com/api/auth/callback/homepage-oidc`.

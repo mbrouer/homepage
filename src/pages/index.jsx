@@ -21,6 +21,7 @@ import { ThemeContext } from "utils/contexts/theme";
 
 import { withPageAuth } from "utils/auth";
 import { getDashboardData } from "utils/config/dashboard";
+import dashboardFetcher from "utils/dashboard-fetcher";
 import useWindowFocus from "utils/hooks/window-focus";
 import normalizeLanguage from "utils/language";
 import themes from "utils/styles/themes";
@@ -48,7 +49,7 @@ export const getServerSideProps = withPageAuth(async () => ({ props: await getDa
 function Index({ initialSettings, fallback }) {
   const windowFocused = useWindowFocus();
   const [stale, setStale] = useState(false);
-  const { data: errorsData } = useSWR("/api/validate");
+  const { data: errorsData } = useSWR("/api/validate", dashboardFetcher);
   const { error: validateError } = errorsData || {};
 
   const handleHashData = useCallback((hashData) => {
@@ -72,7 +73,7 @@ function Index({ initialSettings, fallback }) {
     }
   }, []);
 
-  const { mutate: mutateHash } = useSWR("/api/hash", { onSuccess: handleHashData });
+  const { mutate: mutateHash } = useSWR("/api/hash", dashboardFetcher, { onSuccess: handleHashData });
 
   useEffect(() => {
     if (windowFocused) {
@@ -173,9 +174,9 @@ function Home({ initialSettings }) {
     setSettings(initialSettings);
   }, [initialSettings, setSettings]);
 
-  const { data: services } = useSWR("/api/services");
-  const { data: bookmarks } = useSWR("/api/bookmarks");
-  const { data: widgets } = useSWR("/api/widgets");
+  const { data: services } = useSWR("/api/services", dashboardFetcher);
+  const { data: bookmarks } = useSWR("/api/bookmarks", dashboardFetcher);
+  const { data: widgets } = useSWR("/api/widgets", dashboardFetcher);
 
   const servicesAndBookmarks = [...bookmarks.map((bg) => bg.bookmarks).flat(), ...getAllServices(services)].filter(
     (i) => i?.href,

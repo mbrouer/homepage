@@ -8,6 +8,7 @@ import { ColorContext } from "utils/contexts/color";
 import { SettingsContext } from "utils/contexts/settings";
 import { TabContext } from "utils/contexts/tab";
 import { ThemeContext } from "utils/contexts/theme";
+import dashboardFetcher from "utils/dashboard-fetcher";
 
 const {
   state,
@@ -61,7 +62,7 @@ const {
   const serverSideTranslations = vi.fn(async (language) => ({ _translations: language }));
   const logger = { error: vi.fn() };
 
-  const useSWR = vi.fn((key, config) => {
+  const useSWR = vi.fn((key, fetcher, config) => {
     if (key === "/api/validate") return { data: state.validateData };
     if (key === "/api/hash") {
       state.hashConfig = config;
@@ -323,6 +324,15 @@ describe("pages/index Index routing + SWR branches", () => {
     state.servicesData = [];
     state.bookmarksData = [];
     state.widgetsData = [];
+  });
+
+  it("uses the checked fetcher for every dashboard endpoint", async () => {
+    state.validateData = [];
+    await renderIndex();
+
+    for (const endpoint of ["/api/validate", "/api/hash", "/api/services", "/api/bookmarks", "/api/widgets"]) {
+      expect(useSWR.mock.calls.some(([key, fetcher]) => key === endpoint && fetcher === dashboardFetcher)).toBe(true);
+    }
   });
 
   it("renders the validation error screen when /api/validate returns an error", async () => {
